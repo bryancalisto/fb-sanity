@@ -28,14 +28,14 @@ function hideAllBars() {
  */
 function setupContentObserver() {
     const observer = new MutationObserver(() => {
-        // hideReactionsBar();
-        hideAllBars();
+        hideReactionsBar();
+        // hideAllBars();
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
 }
 
-// hideReactionsBar();
-hideAllBars();
+hideReactionsBar();
+// hideAllBars();
 setupContentObserver();
 console.log('FB Sanity extension loaded');

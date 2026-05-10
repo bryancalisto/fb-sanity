@@ -7,10 +7,15 @@
     "default_popup": "index.html",
     "default_icon": "icon.png"
   },
+  "permissions": ["storage"],
   "content_scripts": [
     {
-        "matches": ["https://facebook.com/", "https://facebook.com/*"],
-        "js": ["main.js"]
+      "matches": [
+        "https://facebook.com/*",
+        "https://*.facebook.com/*"
+      ],
+      "js": ["main.js"],
+      "run_at": "document_idle"
     }
   ]
 }
