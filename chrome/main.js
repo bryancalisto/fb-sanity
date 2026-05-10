@@ -38,3 +38,4 @@ function setupContentObserver() {
 // hideReactionsBar();
 hideAllBars();
 setupContentObserver();
+console.log('FB Sanity extension loaded');
