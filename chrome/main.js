@@ -1,6 +1,6 @@
 const handlers = {
     'en': {
-        'reactions-bar': () => document.querySelectorAll('div[aria-label="Like"').forEach(item => item.parentNode.parentNode.parentNode.parentNode.style.display = 'none'),
+        'reactions-bar': () => document.querySelectorAll('div[aria-label="Like"').forEach(item => item.parentNode.parentNode.parentNode.previousSibling.style.display = 'none'),
         'all-bars': () => document.querySelectorAll('div[aria-label="Like"').forEach(item => item.parentNode.parentNode.parentNode.parentNode.style.display = 'none')
     },
     'es': {
@@ -35,7 +35,6 @@ function setupContentObserver() {
     observer.observe(document.body, { childList: true, subtree: true });
 }
 
-hideReactionsBar();
-// hideAllBars();
+// hideReactionsBar();
 setupContentObserver();
 console.log('FB Sanity extension loaded');
