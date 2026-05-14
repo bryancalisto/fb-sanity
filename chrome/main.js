@@ -8,8 +8,8 @@ const handlers = {
             () => document.querySelectorAll('div[data-ad-rendering-role="like_button"]').forEach(item => console.log(item.parentNode.parentNode)),
         ],
         show: [
-            () => document.querySelectorAll('div[data-ad-rendering-role="like_button"]').forEach(item => item.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.previousSibling.previousSibling.style.display = ''),
             () => document.querySelectorAll('div[data-ad-rendering-role="like_button"]').forEach(item => item.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.previousSibling.style.display = ''),
+            () => document.querySelectorAll('div[data-ad-rendering-role="like_button"]').forEach(item => item.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.previousSibling.previousSibling.style.display = ''),
         ]
     },
     'full-container': {
@@ -28,7 +28,6 @@ function applyReactionsBar(show) {
         const handler = handlers['reactions-bar'][action][i];
         try {
             handler();
-            break;
         } catch(e){
             console.error(`Error applying reactions bar handler (${i}):`, e);
         }
@@ -42,7 +41,6 @@ function applyFullContainer(show) {
         const handler = handlers['full-container'][action][i];
         try {
             handler();
-            break;
         } catch(e){
             console.error(`Error applying full container handler (${i}):`, e);
         }
@@ -94,6 +92,7 @@ function setupOnScrollListener() {
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === 'sync') {
+        cachedPreferences = null;
         applyPreferences();
     }
 });
