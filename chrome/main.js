@@ -75,21 +75,6 @@ function setupContentObserver() {
     observer.observe(document.body, { childList: true, subtree: true });
 }
 
-function setupOnScrollListener() {
-    let timeoutId = null;
-
-    window.addEventListener('scroll', () => {
-        if (timeoutId) {
-            clearTimeout(timeoutId);
-        }
-
-        timeoutId = setTimeout(() => {
-            console.log('Scrolled, reapplying preferences:', new Date().toTimeString());
-            applyPreferences();
-        }, 500);
-    });
-}
-
 chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === 'sync') {
         cachedPreferences = null;
