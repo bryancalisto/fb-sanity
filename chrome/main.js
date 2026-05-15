@@ -10,17 +10,6 @@ function logError (...args) {
     console.error('[FB Sanity]', ...args);
 }
 
-/**
- * How hide / show works:
- * - The user can toggle hiding of reactions bar and full container in the extension dropdown.
- * - When the user toggles the setting, the content script receives the change via chrome.storage.onChanged listener and applies the new preferences by calling applyPreferences function.
- * - A MutationObserver is set up to listen for changes in the DOM. Whenever the DOM changes, it re-applies the preferences to ensure that any new content loaded dynamically also adheres to the user's settings.
- * 
- * How should the hiding work:
- * - Only modify the DOM when the toggle in ON (hide) state, when the toggle is OFF (show) state, do not modify the DOM, just leave it as is. This way we minimize the risk of breaking something on Facebook side, as we are not trying to override any Facebook styles, but just hide the elements by setting display:none on them.
- * - For reactions bar, hide the first element child of the full container. Leave the rest untouched.
- * - For full container, hide all element children of the full container. When showing, do not set display back to '' for any of the children, as we don't want to override any Facebook styles, just leave it as is.
- */
 const handlers = {
     'reactions-bar': {
         hide: [
@@ -32,21 +21,9 @@ const handlers = {
                     return;
                 }
 
-                // check if reactions bar is present (sometimes it's not, e.g. for just posted stuff), if not, skip hiding of 1st non comment child
-                const hasReactionsBar = container.childNodes.length > 1;
-                if (!hasReactionsBar) {
-                    logWarn('No reactions bar found for item:', item);
-                    return;
-                }
-
-                for (const node of container.childNodes) {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        if (node.style.display !== 'none') {
-                            node.style.display = 'none';
-                        }
-
-                        break;
-                    }
+                const firstChild = container.firstElementChild;
+                if (firstChild && firstChild.style.display !== 'none') {
+                    firstChild.style.display = 'none';
                 }
             }),
         ],
@@ -59,21 +36,9 @@ const handlers = {
                     return;
                 }
 
-                // check if reactions bar is present (sometimes it's not, e.g. for just posted stuff), if not, skip hiding of 1st non comment child
-                const hasReactionsBar = container.childNodes.length > 1;
-                if (!hasReactionsBar) {
-                    logWarn('No reactions bar found for item:', item);
-                    return;
-                }
-
-                for (const node of container.childNodes) {
-                    if (node.nodeType === Node.ELEMENT_NODE ) {
-                        if (node.style.display === 'none') {
-                            node.style.display = '';
-                        }
-
-                        break;
-                    }
+                const firstChild = container.firstElementChild;
+                if (firstChild && firstChild.style.display === 'none') {
+                    firstChild.style.display = '';
                 }
             }),
         ]
