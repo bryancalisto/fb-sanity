@@ -10,12 +10,22 @@ function logError (...args) {
     console.error('[FB Sanity]', ...args);
 }
 
+/**
+ * How hide / show works:
+ * - The user can toggle hiding of reactions bar and full container in the extension dropdown.
+ * - When the user toggles the setting, the content script receives the change via chrome.storage.onChanged listener and applies the new preferences by calling applyPreferences function.
+ * - A MutationObserver is set up to listen for changes in the DOM. Whenever the DOM changes, it re-applies the preferences to ensure that any new content loaded dynamically also adheres to the user's settings.
+ * 
+ * How should the hiding work:
+ * - Only modify the DOM when the toggle in ON (hide) state, when the toggle is OFF (show) state, do not modify the DOM, just leave it as is. This way we minimize the risk of breaking something on Facebook side, as we are not trying to override any Facebook styles, but just hide the elements by setting display:none on them.
+ * - For reactions bar, hide the first element child of the full container. Leave the rest untouched.
+ * - For full container, hide all element children of the full container. When showing, do not set display back to '' for any of the children, as we don't want to override any Facebook styles, just leave it as is.
+ */
 const handlers = {
     'reactions-bar': {
         hide: [
             () => document.querySelectorAll('div[data-ad-rendering-role="like_button"]').forEach(item => {
                 const container = item.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
-                console.log('container:', container);
 
                 if (!container){
                     logWarn('Could not find reactions bar container for item:', item);
@@ -30,9 +40,11 @@ const handlers = {
                 }
 
                 for (const node of container.childNodes) {
-                    if (node.nodeType !== Node.COMMENT_NODE && node.style.display !== 'none') {
-                        // node.style.display = 'none';
-                        node.style.backgroundColor = 'red';
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        if (node.style.display !== 'none') {
+                            node.style.display = 'none';
+                        }
+
                         break;
                     }
                 }
@@ -48,8 +60,11 @@ const handlers = {
                 }
 
                 for (const node of container.childNodes) {
-                    if (node.nodeType !== Node.COMMENT_NODE && node.style.display === 'none') {
-                        node.style.display = '';
+                    if (node.nodeType === Node.ELEMENT_NODE ) {
+                        if (node.style.display === 'none') {
+                            node.style.display = '';
+                        }
+
                         break;
                     }
                 }
@@ -66,10 +81,8 @@ const handlers = {
                     return;
                 }
 
-                for (const node of container.childNodes) {
-                    if (node.nodeType === Node.ELEMENT_NODE && node.style.display !== 'none') {
-                        node.style.display = 'none';
-                    }
+                if (container.style.display !== 'none') {
+                    container.style.display = 'none';
                 }
             })
         ],
@@ -82,10 +95,8 @@ const handlers = {
                     return;
                 }
 
-                for (const node of container.childNodes) {
-                    if (node.nodeType === Node.ELEMENT_NODE && node.style.display === 'none') {
-                        node.style.display = '';
-                    }
+                if (container.style.display === 'none') {
+                    container.style.display = '';
                 }
             })
         ]
@@ -122,7 +133,7 @@ let cachedPreferences = null;
 function applyPreferences() {
     if (cachedPreferences) {
         applyReactionsBar(!cachedPreferences.hideReactionsBar);
-        // applyFullContainer(!cachedPreferences.hideFullContainer);
+        applyFullContainer(!cachedPreferences.hideFullContainer);
         return;
     }
 
