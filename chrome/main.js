@@ -1,18 +1,26 @@
+const logPrefix = '[FB Sanity]';
+
 function log (...args) {
-    console.log('[FB Sanity]', ...args);
+    console.log(logPrefix, ...args);
 }
 
 function logWarn(...args) {
-    console.warn('[FB Sanity]', ...args);
+    console.warn(logPrefix, ...args);
 }
 
 function logError (...args) {
-    console.error('[FB Sanity]', ...args);
+    console.error(logPrefix, ...args);
 }
+
+function logDebug (...args) {
+    console.debug(logPrefix, ...args);
+}
+
+const LIKE_BTN_SELECTOR = 'div[data-ad-rendering-role="like_button"]';
 
 const handlers = {
     'reactions-bar': {
-        hide: () => document.querySelectorAll('div[data-ad-rendering-role="like_button"]').forEach(item => {
+        hide: () => document.querySelectorAll(LIKE_BTN_SELECTOR).forEach(item => {
             const container = item.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
 
             if (!container){
@@ -25,7 +33,7 @@ const handlers = {
                 firstChild.style.display = 'none';
             }
         }),
-        show: () => document.querySelectorAll('div[data-ad-rendering-role="like_button"]').forEach(item => {
+        show: () => document.querySelectorAll(LIKE_BTN_SELECTOR).forEach(item => {
             const container = item.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
 
             if (!container){
@@ -40,7 +48,7 @@ const handlers = {
         })
     },
     'full-container': {
-        hide: () => document.querySelectorAll('div[data-ad-rendering-role="like_button"]').forEach(item => {
+        hide: () => document.querySelectorAll(LIKE_BTN_SELECTOR).forEach(item => {
             const container = item.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
 
             if (!container){
@@ -48,11 +56,9 @@ const handlers = {
                 return;
             }
 
-            if (container.style.display !== 'none') {
-                container.style.display = 'none';
-            }
+            container.style.display = 'none';
         }),
-        show: () => document.querySelectorAll('div[data-ad-rendering-role="like_button"]').forEach(item => {
+        show: () => document.querySelectorAll(LIKE_BTN_SELECTOR).forEach(item => {
             const container = item.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
 
             if (!container){
@@ -60,9 +66,7 @@ const handlers = {
                 return;
             }
 
-            if (container.style.display === 'none') {
-                container.style.display = '';
-            }
+            container.style.display = '';
         })
     }
 }
@@ -86,6 +90,7 @@ function applyFullContainer(show) {
 }
 
 let cachedPreferences = null;
+let observer = null;
 
 function applyPreferences() {
     if (cachedPreferences) {
@@ -105,8 +110,8 @@ function applyPreferences() {
 }
 
 function setupContentObserver() {
-    const observer = new MutationObserver(() => {
-        // log('DOM changed, reapplying preferences:', new Date().toTimeString()); // debug
+    observer = new MutationObserver(() => {
+        logDebug('DOM changed, reapplying preferences:', new Date().toTimeString());
         applyPreferences();
     });
 
@@ -115,7 +120,19 @@ function setupContentObserver() {
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === 'sync') {
-        cachedPreferences = null;
+        for (const change in changes) {
+            cachedPreferences[change] = changes[change].newValue;
+        }
+
+        if (!cachedPreferences?.hideReactionsBar && !cachedPreferences?.hideFullContainer ) {
+            logDebug('disabling observer');
+            observer.disconnect();
+        }
+        else {
+            logDebug('re-enabling observer');
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+
         applyPreferences();
     }
 });
