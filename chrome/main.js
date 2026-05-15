@@ -59,6 +59,13 @@ const handlers = {
                     return;
                 }
 
+                // check if reactions bar is present (sometimes it's not, e.g. for just posted stuff), if not, skip hiding of 1st non comment child
+                const hasReactionsBar = container.childNodes.length > 1;
+                if (!hasReactionsBar) {
+                    logWarn('No reactions bar found for item:', item);
+                    return;
+                }
+
                 for (const node of container.childNodes) {
                     if (node.nodeType === Node.ELEMENT_NODE ) {
                         if (node.style.display === 'none') {
@@ -149,7 +156,7 @@ function applyPreferences() {
 
 function setupContentObserver() {
     const observer = new MutationObserver(() => {
-        log('DOM changed, reapplying preferences:', new Date().toTimeString());
+        // log('DOM changed, reapplying preferences:', new Date().toTimeString()); // debug
         applyPreferences();
     });
 
