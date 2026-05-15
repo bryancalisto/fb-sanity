@@ -7,11 +7,12 @@
     <style>
       :root {
         color-scheme: light;
-        --bg: #f4f6f8;
-        --panel: #ffffff;
+        --bg: #fff;
+        --panel: #fff;
         --text: #1f2937;
         --muted: #6b7280;
         --accent: #1877f2;
+        --dark-blue: #001a75;
         --border: #d1d5db;
       }
 
@@ -26,12 +27,6 @@
       .panel {
         padding: 14px;
         background: var(--panel);
-      }
-
-      h1 {
-        margin: 0 0 8px;
-        font-size: 16px;
-        line-height: 1.2;
       }
 
       p {
@@ -53,19 +48,31 @@
         margin-top: 2px;
         accent-color: var(--accent);
       }
+
+      .top-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        background-color: var(--dark-blue);
+        padding: 15px;
+      }
+
     </style>
   </head>
   <body>
+    <div class="top-container">
+      <img src="icon.png" alt="FB Sanity" width="120px" height="120px" />
+    </div>
+
     <div class="panel">
-      <h1>FB Sanity</h1>
-      <p>Toggle which areas stay hidden.</p>
+      <p>Toggle which areas stay hidden</p>
       <label>
         <input id="hideReactionsBar" type="checkbox" checked />
-        <span>Hide reactions bar</span>
+        <span>Reactions summary</span>
       </label>
       <label>
         <input id="hideFullContainer" type="checkbox" checked />
-        <span>Hide full reactions container</span>
+        <span>Full reactions container</span>
       </label>
     </div>
     <script src="popup.js"></script>
