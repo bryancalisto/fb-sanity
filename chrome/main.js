@@ -28,6 +28,13 @@ const handlers = {
                 return;
             }
 
+            const hasReactionsBar = container.children.length > 1;
+
+            if (!hasReactionsBar) {
+                logDebug('No reactions bar found for item:', item);
+                return;
+            }
+
             const firstChild = container.firstElementChild;
             if (firstChild && firstChild.style.display !== 'none') {
                 firstChild.style.display = 'none';
@@ -35,6 +42,13 @@ const handlers = {
         }),
         show: () => document.querySelectorAll(LIKE_BTN_SELECTOR).forEach(item => {
             const container = item.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+
+            const hasReactionsBar = container.children.length > 1;
+
+            if (!hasReactionsBar) {
+                logDebug('No reactions bar found for item:', item);
+                return;
+            }
 
             if (!container){
                 logWarn('Could not find reactions bar container for item:', item);
