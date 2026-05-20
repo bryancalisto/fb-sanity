@@ -1,6 +1,6 @@
 const DEFAULTS = {
     hideReactionsBar: true,
-    hideFullContainer: true
+    hideFullContainer: false
 };
 
 const reactionsBarCheckbox = document.getElementById('hideReactionsBar');
