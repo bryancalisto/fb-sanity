@@ -1,17 +1,18 @@
-<center>
-    <h1><i>FB Sanity</i></h1>
-</center>
-
-<center style="padding: 10px;">
-    <img src="chrome/icon.png" style="width: 150px;clip-path: inset(2px 2px);">
-</center>
+<!-- More about "user-content-toc"? See https://stackoverflow.com/questions/78111887/how-to-remove-unwanted-horizontals-line-in-markdown -->
+<div id="user-content-toc">
+  <ul align="center" style="list-style: none">
+    <summary>
+      <h1><i>FB Sanity</i></h1>
+    </summary>
+  </ul>
+</div>
 
 ## <i>What's this?</i>
 FB Sanity is a browser extension (Chrome support only for now) whose goal is to toggle the visibility of the reaction summary bar (you know, where the  👍❤️😂😡 counters are)  and / or the full reactions container (including the bar where the like button is).
 
-<center style="padding: 10px;">
+<div align="center" style="padding: 20px;">
     <img src="images/screenshot.png" style="width: 65%">
-</center>
+</div>
 
 ## <i>The "why"</i>
 Looking at the Facebook reactions (you know, the  👍❤️😂😡...) counters  can trigger a nerve on some people. They are evidence of cancellation and sometimes reflect inmature or hateful attitudes from people that react to a post.
