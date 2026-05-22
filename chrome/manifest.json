@@ -1,6 +1,6 @@
 {
   "name": "FB Sanity",
-  "description": "Facebook extension to toggle post reactions visibility and stay away from their toxicity when desired.",
+  "description": "Extension to toggle Facebook post reactions visibility and stay away from their toxicity when desired.",
   "version": "0.0.1",
   "manifest_version": 3,
   "action": {
