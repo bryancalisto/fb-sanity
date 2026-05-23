@@ -10,6 +10,8 @@
 ## <i>What's this?</i>
 FB Sanity is a browser extension (Chrome support only for now) whose goal is to toggle the visibility of the reaction summary bar (you know, where the  👍❤️😂😡 counters are)  and / or the full reactions container (including the bar where the like button is).
 
+Website: https://fb-sanity.web.app/
+
 <div align="center" style="padding: 20px;">
     <img src="images/screenshot.png" style="width: 65%">
 </div>
