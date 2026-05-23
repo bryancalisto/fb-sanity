@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FB Sanity</title>
+  <meta name="description" content="FB Sanity is a simple Chrome extension that hides Facebook reaction counters and reaction bars when you want a calmer feed.">
+  <style>
+    :root {
+      --bg: #08111f;
+      --bg-2: #0d1b33;
+      --panel: rgba(8, 17, 31, 0.72);
+      --panel-strong: rgba(15, 27, 51, 0.92);
+      --line: rgba(148, 163, 184, 0.2);
+      --text: #e5eefb;
+      --muted: #9fb2d1;
+      --accent: #44a0ff;
+      --accent-2: #8b5cf6;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(68, 160, 255, 0.2), transparent 35%),
+        radial-gradient(circle at 85% 10%, rgba(139, 92, 246, 0.18), transparent 30%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 40px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      gap: 28px;
+      align-items: center;
+      min-height: calc(100vh - 72px);
+    }
+
+    .hero-low {
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 30px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-size: 0.92rem;
+      letter-spacing: 0.01em;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow:hover {
+      cursor: pointer;
+    }
+
+    .brand-mark {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      display: inline-grid;
+      place-items: center;
+      background: linear-gradient(145deg, #ff6a00, #ffb347 32%, #f7df6a 58%, #7dd3fc 100%);
+      box-shadow: 0 14px 30px rgba(68, 160, 255, 0.28);
+      color: #09111d;
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 5vw, 4.8rem);
+      line-height: 0.95;
+      margin: 0 auto 18px;
+      letter-spacing: -0.05em;
+      max-width: 11ch;
+      text-align: center;
+    }
+
+    .lede {
+      max-width: 56ch;
+      font-size: clamp(1.05rem, 1.6vw, 1.18rem);
+      line-height: 1.7;
+      color: var(--muted);
+      margin: 0 0 24px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      border: 1px solid transparent;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      color: white;
+      box-shadow: 0 14px 34px rgba(29, 78, 216, 0.3);
+    }
+
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 620px;
+    }
+
+    .fact {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+    }
+
+    .fact strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 4px;
+      font-size: 0.98rem;
+    }
+
+    .visual {
+      position: relative;
+      padding: 18px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .visual::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(68, 160, 255, 0.16), transparent 22%),
+        radial-gradient(circle at 80% 18%, rgba(139, 92, 246, 0.16), transparent 18%);
+      pointer-events: none;
+    }
+
+    .browser {
+      position: relative;
+      background: #1f2937;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .browser-top {
+      height: 54px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      background: #243047;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #64748b;
+    }
+
+    .address {
+      margin-left: auto;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      font-size: 0.86rem;
+    }
+
+    .feed {
+      min-height: 560px;
+      padding: 18px;
+      background:
+        linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(17, 24, 39, 0.92)),
+        linear-gradient(135deg, rgba(68, 160, 255, 0.12), rgba(255, 255, 255, 0));
+    }
+
+    .story {
+      height: 86px;
+      border-radius: 16px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      margin-bottom: 14px;
+    }
+
+    .post {
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .post-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #22c55e, #0ea5e9);
+    }
+
+    .meta .name {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .meta .time {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .caption {
+      padding: 0 16px 14px;
+      color: var(--text);
+    }
+
+    .post-media {
+      height: 420px;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(90deg, #d8a11d 0 24%, #2f2419 24% 76%, #d8a11d 76% 100%);
+      position: relative;
+    }
+
+    .guitar {
+      width: 36%;
+      height: 88%;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, #efce66 0 12%, #f5d55a 12% 80%, #e0aa16 80% 100%);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18), 0 18px 50px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    .popup {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      width: 220px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #0f172a;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+    }
+
+    .popup-head {
+      height: 132px;
+      background: linear-gradient(180deg, #173c92, #0b2c77);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 3rem;
+    }
+
+    .popup-body {
+      padding: 14px 14px 16px;
+    }
+
+    .popup-body .small {
+      color: #64748b;
+      font-size: 0.82rem;
+      margin-bottom: 12px;
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid #e2e8f0;
+      font-size: 0.93rem;
+    }
+
+    .check input { accent-color: #2563eb; }
+
+    .footer {
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .footer a { color: #b9d7ff; }
+
+    @media (max-width: 900px) {
+      .hero {
+        text-align: center;
+        justify-content: center;
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding-top: 12px;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .visual { order: -1; }
+      h1 { max-width: none; }
+      .footer {
+        margin-top: 2rem;
+        justify-content: center;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .wrap { width: min(100% - 20px, 1120px); padding-top: 20px; }
+      .facts { grid-template-columns: 1fr; }
+      .feed { min-height: 460px; }
+      .post-media { height: 320px; }
+      .popup {
+        width: 180px;
+        right: 12px;
+        top: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-low">
+        <div class="eyebrow" onclick="window.open('http://www.google.com')">
+          <span class="brand-mark">
+            <img width="42" height="42" src="icon-48.png" />
+          </span>
+          FB Sanity for Chrome
+        </div>
+
+        <h1>Hide the noise on Facebook.</h1>
+
+        <p class="lede">
+          Looking at the Facebook reactions, the <strong>👍❤️😂😡</strong> counters, can trigger a nerve for some people. They can be hard to ignore, and they may affect you in ways that neither psychologists nor sociologists can truly measure.
+        </p>
+        <div class="facts" id="how-it-works">
+          <div class="fact">
+            <strong>Simple controls</strong>
+            Toggle the reaction summary bar and/or the full reactions container visibility from the popup.
+          </div>
+          <div class="fact">
+            <strong>No user data</strong>
+            The extension does not collect any data from you.
+          </div>
+          <div class="fact">
+            <strong>Runs on Facebook</strong>
+            The extension code activates only when visiting <code>facebook.com website</code>.
+          </div>
+          <div class="fact">
+            <strong>Kept minimal and simple</strong>
+            No bloathing features. Just does the hiding / displaying.
+          </div>
+        </div>
+      </div>
+
+      <div class="visual" aria-label="Illustration of FB Sanity working on Facebook">
+        <div class="browser">
+          <div class="browser-top">
+            <div class="dots" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="address">facebook.com</div>
+          </div>
+          <div class="feed">
+            <div class="story"></div>
+            <article class="post">
+              <div class="post-head">
+                <div class="avatar"></div>
+                <div class="meta">
+                  <div class="name">A calm feed</div>
+                  <div class="time">4 min · public</div>
+                </div>
+              </div>
+              <div class="caption">But still, you can keep seeing memes, news, inspiring stuff, and stay in contact with friends.</div>
+              <div class="post-media">
+                <div class="guitar" aria-hidden="true"></div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <aside class="popup" aria-label="Extension popup mockup">
+          <div class="popup-body">
+            <div class="small">Toggle which areas stay hidden</div>
+            <label class="check"><input type="checkbox" checked> Reactions summary</label>
+            <label class="check"><input type="checkbox"> Full reactions container</label>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <div class="footer">
+      <div>It is completely open source.</div>
+      <div>
+        <a href="https://github.com/bryancalisto/fb-sanity" target="_blank" rel="noopener noreferrer">GitHub repository</a> ·
+        <a href="privacy-policy.html">Privacy policy</a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
